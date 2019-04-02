@@ -3,7 +3,7 @@ import math
 
 from datetime import datetime
 
-from hunor.utils import get_class_files
+from hunor.utils import get_java_files
 from hunor.tools.major import Major
 from hunor.tools.mujava import MuJava
 from hunor.tools.pit import Pit
@@ -66,7 +66,7 @@ def equivalence_analysis(jdk, junit, classpath, test_suites, mutants,
 
         if os.path.exists(mutant.path):
             compile_success = True
-            for java_file in get_class_files(mutant.path, ext='.java'):
+            for java_file in get_java_files(mutant.path):
                 compile_success = compile_success and jdk.run_javac(
                     java_file, 60, mutant.path, "-classpath", classpath)
 

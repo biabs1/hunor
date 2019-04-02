@@ -2,9 +2,10 @@ import os
 import copy
 
 from hunor.tools.mujava import MuJava
-from hunor.tools.java import JDK
+from hunor.tools.java import Java
 from hunor.tools.maven import Maven
-from hunor.utils import get_class_files, write_json, read_json, sort_files
+from hunor.utils import  write_json, read_json, sort_files
+from hunor.utils import get_java_files
 from hunor.args import arg_parser_gen, to_options_gen
 from hunor.main import Hunor
 from hunor.db.models import Database
@@ -14,7 +15,7 @@ from hunor.db.queries import Queries
 def main():
     options = to_options_gen(arg_parser_gen())
 
-    jdk = JDK(options.java_home)
+    jdk = Java(options.java_home)
 
     classes_dir = _maven_work(options, jdk)
 
@@ -28,7 +29,7 @@ def main():
     analysed_files = state[1]
 
     count = 1
-    files = get_class_files(options.java_src, ext='.java')
+    files = get_java_files(options.java_src)
 
     for i, file in enumerate(sort_files(files)):
         print('PROCESSING {0} {1}/{2}'.format(file, i + 1, len(files)))

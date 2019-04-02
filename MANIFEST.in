@@ -17,7 +17,7 @@ include hunor/tools/bin/major/config/config.jar
 include hunor/tools/bin/major/lib/ant.jar
 include hunor/tools/bin/major/lib/ant-antlr.jar
 include hunor/tools/bin/major/lib/ant-apache-bcel.jar
-include hunor/include hunor/tools/bin/major/lib/ant-apache-bsf.jar
+include hunor/tools/bin/major/lib/ant-apache-bsf.jar
 include hunor/tools/bin/major/lib/ant-apache-log4j.jar
 include hunor/tools/bin/major/lib/ant-apache-oro.jar
 include hunor/tools/bin/major/lib/ant-apache-regexp.jar

@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from hunor.utils import get_class_files, generate_classpath, config
+from hunor.utils import get_java_files
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,8 +56,7 @@ class Evosuite:
         classpath = generate_classpath([self.classpath, self.tests_src, JUNIT,
                                         HAMCREST, EVOSUITE_RUNTIME])
 
-        for java_test_file in sorted(get_class_files(
-                self.tests_src, ext='.java')):
+        for java_test_file in sorted(get_java_files(self.tests_src)):
             self.jdk.run_javac(os.path.join(self.tests_src, java_test_file),
                                5 * 60, self.tests_src, '-classpath', classpath,
                                '-d', self.tests_classes)

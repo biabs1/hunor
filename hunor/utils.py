@@ -3,22 +3,37 @@ import re
 import json
 
 
-def get_class_files(path, package='', ext='.class'):
+def get_class_files(path):
+    return get_files(path, ext='.class')
+
+
+def get_java_files(path):
+    return get_files(path, ext='.java')
+
+
+def get_files(path, root='', ext=None):
     files = []
 
     for node in os.listdir(path):
         node_path = os.path.join(path, node)
         if os.path.isdir(node_path):
-            files += get_class_files(node_path, os.path.join(package, node),
-                                     ext)
-        elif os.path.splitext(node_path)[1] == ext:
-            files.append(os.path.join(package, node))
+            files += get_files(node_path, os.path.join(root, node), ext)
+        elif ext is None or os.path.splitext(node_path)[1] == ext:
+            files.append(os.path.join(root, node))
 
     return files
 
 
 def generate_classpath(paths):
-    return os.pathsep.join(paths)
+    return os.pathsep.join([p for p in paths if p is not None and len(p) > 0])
+
+
+def package_to_dir(package):
+    return package.replace('.', os.sep)
+
+
+def dir_to_package(directory):
+    return directory.replace(os.sep, '.')
 
 
 def qualified_class_to_file(qualified_class, ext='.java'):
