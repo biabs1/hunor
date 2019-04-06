@@ -17,3 +17,7 @@ hunor-output/
 
 **/major/**/*.class
 **/mujava/**/*.class
+
+.classpath
+.project
+.settings
