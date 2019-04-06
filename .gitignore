@@ -21,3 +21,9 @@ hunor-output/
 .classpath
 .project
 .settings
+.vscode
+.eggs
+cover
+
+.noseids
+.coverage

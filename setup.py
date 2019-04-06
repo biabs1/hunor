@@ -34,7 +34,8 @@ setup(
     ],
     test_suite='nose.collector',
     tests_require=[
-        'nose'
+        'nose==1.3.7',
+        'coverage==4.5.3'
     ],
     include_package_data=True,
     zip_safe=False,
@@ -50,5 +51,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Test :: Mutation'
     ],
-    python_requires='>=3'
+    python_requires='>=3',
+    setup_requires=[
+        'nose==1.3.7'
+    ]
 )
