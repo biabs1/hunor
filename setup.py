@@ -35,7 +35,8 @@ setup(
     test_suite='nose.collector',
     tests_require=[
         'nose==1.3.7',
-        'coverage==4.5.3'
+        'coverage==4.5.3',
+        'rednose==1.3.0'
     ],
     include_package_data=True,
     zip_safe=False,
