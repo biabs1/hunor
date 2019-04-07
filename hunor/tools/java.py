@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 
 
@@ -51,24 +52,61 @@ class JDK:
             print("javac timeout compiling {0}".format(java_file))
             return False
 
+TIMEOUT = 10
+
 
 class Java:
 
     def __init__(self, java_home=None):
         self.java_home = java_home
+        self._set_home()
+        self._check()
+
+    def _set_home(self):
+        if not self.java_home:
+            if os.getenv('JAVA_HOME'):
+                self.java_home = os.getenv('JAVA_HOME')
+            else:
+                print('JAVA_HOME undefined', file=sys.stderr)
+                raise SystemExit()
+
+    def _check(self):
+        try:
+            self._version_java()
+            self._version_javac()
+        except FileNotFoundError:
+            print('{0} is not a valid JDK.'.format(self.java_home),
+                  file=sys.stderr)
+            raise SystemExit()
 
     @property
     def java(self):
         return os.path.join(self.java_home, 'jre', 'bin', 'java')
 
+    @property
+    def javac(self):
+        return os.path.join(self.java_home, 'bin', 'javac')
+
     def _version_java(self):
         return self.run('-version')
 
     def run(self, *args):
-        return self.exec_java(None, self.get_env(), None, *args)
+        return self.exec_java(None, self.get_env(), TIMEOUT, *args)
 
     def exec_java(self, cwd, env, timeout, *args):
         return Java._exec(self.java, cwd, env, timeout, *args)
+
+    def _version_javac(self):
+        return self.run_javac(None, '-version')
+
+    def run_javac(self, java_file, *args):
+        return self.exec_javac(java_file, None, self.get_env(), TIMEOUT, *args)
+
+    def exec_javac(self, java_file, cwd, env, timeout, *args):
+        if java_file:
+            args = (java_file,) + args
+
+        return Java._exec(self.javac, cwd, env, timeout, *args)
 
     @staticmethod
     def _exec(program, cwd, env, timeout, *args):

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import os
 import subprocess
 
-from hunor.tools.java import JDK, Java
+from hunor.tools.java import JDK, Java, TIMEOUT as JAVA_TIMEOUT
 
 
 class TestJDK(TestCase):
@@ -147,11 +147,13 @@ class TestJava(TestCase):
 
     def test_java_property(self):
         java = Java(self.JAVA_HOME)
+        java._check = MagicMock()
 
         self.assertEqual(os.path.join(self.JAVA_HOME, 'jre', 'bin', 'java'),
                          java.java)
 
     def test_exec_java(self):
+        subprocess.check_output = MagicMock(return_value=None)
         java = Java(self.JAVA_HOME)
 
         subprocess.check_output = MagicMock(return_value='OK')
@@ -162,6 +164,7 @@ class TestJava(TestCase):
             cwd='a', env=None, timeout=1, stderr=subprocess.STDOUT)
 
     def test_run(self):
+        subprocess.check_output = MagicMock(return_value=None)
         java = Java(self.JAVA_HOME)
 
         subprocess.check_output = MagicMock(return_value='OK')
@@ -169,10 +172,11 @@ class TestJava(TestCase):
         self.assertEqual('OK', java.run('a', 'b', 'c'))
         subprocess.check_output.assert_called_once_with(
             [java.java, 'a', 'b', 'c'], cwd=None, env=java.get_env(),
-            timeout=None, stderr=subprocess.STDOUT
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
         )
 
     def test_version_java(self):
+        subprocess.check_output = MagicMock(return_value=None)
         java = Java(self.JAVA_HOME)
 
         subprocess.check_output = MagicMock(return_value='java 1.8.0_202')
@@ -180,10 +184,11 @@ class TestJava(TestCase):
         self.assertEqual('java 1.8.0_202', java._version_java())
         subprocess.check_output.assert_called_once_with(
             [java.java, '-version'], cwd=None, env=java.get_env(),
-            timeout=None, stderr=subprocess.STDOUT
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
         )
 
     def test_get_env(self):
+        subprocess.check_output = MagicMock(return_value=None)
         java = Java(self.JAVA_HOME)
 
         env = java.get_env()
@@ -193,6 +198,7 @@ class TestJava(TestCase):
         self.assertTrue(os.path.join(java.java_home, 'bin') in env['PATH'])
 
     def test_get_env_with_variables(self):
+        subprocess.check_output = MagicMock(return_value=None)
         java = Java(self.JAVA_HOME)
 
         env = java.get_env({'A_B_C_D_583': 'OK'})
@@ -201,3 +207,100 @@ class TestJava(TestCase):
         self.assertTrue(os.environ['PATH'] in env['PATH'])
         self.assertTrue(os.path.join(java.java_home, 'bin') in env['PATH'])
         self.assertEqual('OK', env['A_B_C_D_583'])
+
+    def test_check_java_home_none(self):
+        self._del_java_home_env()
+
+        with self.assertRaises(SystemExit):
+            Java()
+
+    def test_check_java_home_arg(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        self._del_java_home_env()
+
+        java = Java(self.JAVA_HOME)
+
+        self.assertTrue(java.java.startswith(self.JAVA_HOME))
+        self.assertTrue(java.javac.startswith(self.JAVA_HOME))
+
+        subprocess.check_output.assert_any_call(
+            [java.java, '-version'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+        subprocess.check_output.assert_any_call(
+            [java.javac, '-version'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+    def test_set_home_in_env(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        os.environ['JAVA_HOME'] = self.JAVA_HOME
+
+        java = Java()
+
+        self.assertTrue(java.java.startswith(self.JAVA_HOME))
+        self.assertTrue(java.javac.startswith(self.JAVA_HOME))
+
+        subprocess.check_output.assert_any_call(
+            [java.java, '-version'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+        subprocess.check_output.assert_any_call(
+            [java.javac, '-version'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+    def test_check_wrong_java_home(self):
+        subprocess.check_output = MagicMock(side_effect=FileNotFoundError())
+
+        with self.assertRaises(SystemExit):
+            Java('wrong_java_home')
+
+    def test_javac_property(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        java = Java(self.JAVA_HOME)
+
+        self.assertEqual(os.path.join(self.JAVA_HOME, 'bin', 'javac'),
+                         java.javac)
+
+    def test_run_javac(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        java = Java(self.JAVA_HOME)
+
+        subprocess.check_output = MagicMock(return_value='OK')
+
+        self.assertEqual('OK', java.run_javac('file.java', 'b', 'c'))
+        subprocess.check_output.assert_called_once_with(
+            [java.javac, 'file.java', 'b', 'c'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+    def test_exec_javac(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        java = Java(self.JAVA_HOME)
+
+        subprocess.check_output = MagicMock(return_value='OK')
+
+        self.assertEqual('OK', java.exec_javac('file.java', 'src_dir', None,
+                                               1, 'b'))
+        subprocess.check_output.assert_called_once_with(
+            [os.path.join(self.JAVA_HOME, 'bin', 'javac'), 'file.java', 'b'],
+            cwd='src_dir', env=None, timeout=1, stderr=subprocess.STDOUT)
+
+    def test_version_javac(self):
+        subprocess.check_output = MagicMock(return_value=None)
+        java = Java(self.JAVA_HOME)
+
+        subprocess.check_output = MagicMock(return_value='javac 1.8.0_202')
+
+        self.assertEqual('javac 1.8.0_202', java._version_javac())
+        subprocess.check_output.assert_called_once_with(
+            [java.javac, '-version'], cwd=None, env=java.get_env(),
+            timeout=JAVA_TIMEOUT, stderr=subprocess.STDOUT
+        )
+
+    def _del_java_home_env(self):
+        if 'JAVA_HOME' in os.environ:
+            del os.environ['JAVA_HOME']
