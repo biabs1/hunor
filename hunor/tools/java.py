@@ -50,3 +50,48 @@ class JDK:
         except subprocess.TimeoutExpired:
             print("javac timeout compiling {0}".format(java_file))
             return False
+
+
+class Java:
+
+    def __init__(self, java_home=None):
+        self.java_home = java_home
+
+    @property
+    def java(self):
+        return os.path.join(self.java_home, 'jre', 'bin', 'java')
+
+    def _version_java(self):
+        return self.run('-version')
+
+    def run(self, *args):
+        return self.exec_java(None, self.get_env(), None, *args)
+
+    def exec_java(self, cwd, env, timeout, *args):
+        return Java._exec(self.java, cwd, env, timeout, *args)
+
+    @staticmethod
+    def _exec(program, cwd, env, timeout, *args):
+        try:
+            command = [program] + list(args)
+
+            return subprocess.check_output(command, cwd=cwd, env=env,
+                                           timeout=timeout,
+                                           stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            raise e
+        except subprocess.TimeoutExpired as e:
+            raise e
+        except FileNotFoundError as e:
+            raise e
+
+    def get_env(self, variables=None):
+        env = os.environ.copy()
+        env['JAVA_HOME'] = self.java_home
+        env['PATH'] = os.pathsep.join(
+            [env['PATH'], os.path.join(self.java_home, 'bin')])
+
+        if variables:
+            env.update(variables)
+
+        return env
