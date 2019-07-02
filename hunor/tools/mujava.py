@@ -29,8 +29,7 @@ class MuJava:
         mutants_data = {}
 
         log_file = os.sep.join([self.mutants_dir if not log_dir else log_dir,
-                                'mutation_log'])
-
+                                'mutation_full_log'])
         if os.path.exists(log_file):
             with open(log_file) as log:
                 for line in log.readlines():
@@ -42,11 +41,12 @@ class MuJava:
                             operator=operator,
                             original_symbol=None,
                             replacement_symbol=None,
-                            method=data[2],
-                            line_number=int(data[1]) if (
-                                not operator == 'SDL') else int(data[1]) - 1,
-                            transformation=':'.join(data[3:]),
-                            path=self._mutant_dir(data[0])
+                            method=data[3],
+                            line_number=int(data[2]) if (
+                                not operator == 'SDL') else int(data[2]) - 1,
+                            transformation=':'.join(data[11:]),
+                            path=self._mutant_dir(data[0]),
+                            mutation=data[6]
                         )
                 log.close()
 

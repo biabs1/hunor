@@ -29,3 +29,5 @@ cover
 .coverage
 
 tags
+
+result/

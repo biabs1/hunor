@@ -14,7 +14,7 @@ class Result:
 class Mutant:
 
     def __init__(self, mid, operator, original_symbol, replacement_symbol,
-                 method, line_number, transformation, path):
+                 method, line_number, transformation, path, mutation=None):
         self.id = mid
         self.operator = operator
         self.original_symbol = original_symbol
@@ -32,7 +32,7 @@ class Mutant:
         self.is_invalid = False
         self.label = mid
         self.statement_operator = None
-        self.mutation = self.gen_label()
+        self.mutation = self.gen_label() if not mutation else mutation
         self.mutation_label = self.mutation
 
     def __str__(self):
