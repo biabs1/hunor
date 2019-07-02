@@ -359,12 +359,12 @@ def _percent(d, key, decimal=True):
 def write_state_csv(abstract, output_dir, filename):
     write_json(abstract, output_dir=output_dir, name=filename)
     with open(os.path.join(output_dir, filename + '.csv'), 'w') as csv:
-        csv.write("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}\n".format(
+        csv.write("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}\n".format(
             '', 'kdm', '%', 'kim', '%', 'kds', '%', 'kis', '%', 'total'
         ))
         for r in sort_state(abstract):
             r = r[0]
-            csv.write("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}\n".format(
+            csv.write("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}\n".format(
                 r,
                 abstract[r]['kdm'],
                 _percent(abstract[r], 'kdm'),

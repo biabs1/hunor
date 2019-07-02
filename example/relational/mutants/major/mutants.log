@@ -1,7 +1,0 @@
-1:ROR:>=(int,int):!=(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> var1 != var2
-2:ROR:>=(int,int):<(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> var1 < var2
-3:ROR:>=(int,int):<=(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> var1 <= var2
-4:ROR:>=(int,int):==(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> var1 == var2
-5:ROR:>=(int,int):>(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> var1 > var2
-6:ROR:>=(int,int):FALSE(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> false
-7:ROR:>=(int,int):TRUE(int,int):br.ufal.ic.masg.operations.GreaterOrEqualThan@function(int,int):9:var1 >= var2 |==> true
