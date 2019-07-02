@@ -27,3 +27,7 @@ cover
 
 .noseids
 .coverage
+
+tags
+
+result/

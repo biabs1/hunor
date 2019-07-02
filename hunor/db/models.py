@@ -40,6 +40,12 @@ class Target(BaseModel):
     operator_kind = CharField(null=True)
     operator = CharField(null=True)
     coverage = IntegerField(null=False)
+    oid = IntegerField(null=True)
+    target_class = CharField(null=True)
+    target_repr = CharField(null=True)
+    children = JSONField()
+    directory = CharField(null=True)
+    prefix_operator = BooleanField(null=False, default=False)
 
     def save_dmsg(self, output_dir, format='png'):
         mutants = self.mutants_to_hunor()
@@ -479,6 +485,13 @@ def dict_to_target(d):
     target.operand_nodes = d['operand_nodes']
     target.operator_kind = d['operator_kind']
     target.operator = d['operator']
+    target.oid = d['oid'] if 'oid' in d else None
+    target.target_class = d['target_class'] if 'target_class' in d else None
+    target.target_repr = d['target_repr'] if 'target_repr' in d else None
+    target.children = d['children'] if 'children' in d else []
+    target.directory = d['directory'] if 'directory' in d else None
+    target.prefix_operator = (d['prefix_operator']
+                              if 'prefix_operator' in d else False)
 
     return target
 

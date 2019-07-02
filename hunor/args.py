@@ -20,7 +20,7 @@ class Options:
     def __init__(self, maven_home, java_home, config_file, mutants,
                  mutation_tool, sut_class=None, source=None,
                  output=DEFAULT['output'], is_evosuite_disabled=False,
-                 is_randoop_disabled=False, is_minimal_testsuite_disabled=True,
+                 is_randoop_disabled=False, is_minimal_testsuite_disabled=False,
                  maven_timeout=DEFAULT['maven_timeout'],
                  coverage_threshold=DEFAULT['coverage_threshold'],
                  no_compile=False, suites_evosuite=DEFAULT['suites_number'],
