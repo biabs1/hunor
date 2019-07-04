@@ -51,7 +51,7 @@ class HunorPlugin:
             mutant = None
 
             for m in t[target]:
-                if m['tid'] == int(target):
+                if m['tid'] == int(target) and m['directory']:
                     mutant = m
                     break
 
