@@ -7,6 +7,7 @@ from hunor.utils import read_json
 TIMEOUT = 5 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
+VERSION = '0.2.0'
 
 
 class HunorPlugin:
@@ -17,7 +18,7 @@ class HunorPlugin:
 
     @staticmethod
     def _plugin_ref(goal):
-        return '{0}:{1}:{2}'.format(GROUP_ID, ARTIFACT_ID, goal)
+        return '{0}:{1}:{2}:{3}'.format(GROUP_ID, ARTIFACT_ID, VERSION, goal)
 
     @staticmethod
     def _includes(file):
