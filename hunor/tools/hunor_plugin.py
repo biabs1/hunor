@@ -7,7 +7,7 @@ from hunor.utils import read_json
 TIMEOUT = 5 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 
 class HunorPlugin:
