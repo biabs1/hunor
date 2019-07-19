@@ -18,7 +18,7 @@ def main():
     options = to_options_gen(arg_parser_gen())
 
     _create_mutants_dir(options)
-    tool = HunorPlugin(options.source, options.mutants)
+    tool = HunorPlugin(options)
     state = _recover_state(options)
     db = _initialize_db(options)
     targets = state[0]

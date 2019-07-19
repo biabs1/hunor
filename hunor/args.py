@@ -24,7 +24,8 @@ class Options:
                  maven_timeout=DEFAULT['maven_timeout'],
                  coverage_threshold=DEFAULT['coverage_threshold'],
                  no_compile=False, suites_evosuite=DEFAULT['suites_number'],
-                 suites_randoop=DEFAULT['suites_number']):
+                 suites_randoop=DEFAULT['suites_number'],
+                 is_enable_reduce=False, is_enable_new_mutations=False):
 
         if maven_home:
             self.maven_home = os.path.abspath(maven_home)
@@ -51,6 +52,8 @@ class Options:
         self.suites_randoop = suites_randoop
         self.java_src = _set_java_src(self.config_file)
         self.is_minimal_testsuite_disabled = is_minimal_testsuite_disabled
+        self.is_enable_reduce = is_enable_reduce
+        self.is_enable_new_mutations = is_enable_new_mutations
 
     def __str__(self):
         return json.dumps({
@@ -70,7 +73,9 @@ class Options:
                 'suites_evosuite': self.suites_evosuite,
                 'suites_randoop': self.suites_randoop,
                 'is_minimal_testsuite_disabled':
-                    self.is_minimal_testsuite_disabled
+                    self.is_minimal_testsuite_disabled,
+                'is_enable_reduce': self.is_enable_reduce,
+                'is_enable_new_mutations': self.is_enable_new_mutations
         }, indent=2)
 
 
@@ -118,7 +123,10 @@ def _to_options(parser):
         no_compile=o.no_compile,
         suites_evosuite=int(o.suites_evosuite),
         suites_randoop=int(o.suites_randoop),
-        is_minimal_testsuite_disabled=o.is_minimal_testsuite_disabled
+        is_minimal_testsuite_disabled=o.is_minimal_testsuite_disabled,
+        is_enable_reduce=o.is_enable_reduce,
+        is_enable_new_mutations=o.is_enable_new_mutations
+
     )
 
 
@@ -221,5 +229,13 @@ def _default_arg_parser():
     parser.add_argument('--disable-minimal-testsuite',
                         action='store_true',
                         dest='is_minimal_testsuite_disabled')
+
+    parser.add_argument('--enable-reduce',
+                        action='store_true',
+                        dest='is_enable_reduce')
+
+    parser.add_argument('--enable-new-mutations',
+                        action='store_true',
+                        dest='is_enable_new_mutations')
 
     return parser

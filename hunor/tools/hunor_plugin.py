@@ -7,14 +7,16 @@ from hunor.utils import read_json
 TIMEOUT = 5 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.2.1'
+VERSION = '0.3.0'
 
 
 class HunorPlugin:
 
-    def __init__(self, project_dir, mutants_dir):
-        self.project_dir = project_dir
-        self.mutants_dir = mutants_dir
+    def __init__(self, options):
+        self.project_dir = options.project_dir
+        self.mutants_dir = options.mutants_dir
+        self.is_enable_reduce = options.is_enable_reduce
+        self.is_enable_new_mutations = options.is_enable_new_mutations
 
     @staticmethod
     def _plugin_ref(goal):
@@ -29,6 +31,10 @@ class HunorPlugin:
         maven = MavenFactory.get_instance()
         maven.exec(self.project_dir, TIMEOUT,
                    self._plugin_ref('mujava-generate'),
+                   ('-Dhunor.enableRules='
+                    + 'true' if self.is_enable_reduce else 'false'),
+                   ('-Dhunor.enableNewMutations='
+                    + 'true' if self.is_enable_reduce else 'false'),
                    self._includes(class_file))
 
         class_name = class_file.split('.')[0].replace(os.sep, '.')
