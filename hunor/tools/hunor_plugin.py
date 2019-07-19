@@ -31,10 +31,10 @@ class HunorPlugin:
         maven = MavenFactory.get_instance()
         maven.exec(self.project_dir, TIMEOUT,
                    self._plugin_ref('mujava-generate'),
-                   ('-Dhunor.enableRules='
-                    + 'true' if self.is_enable_reduce else 'false'),
-                   ('-Dhunor.enableNewMutations='
-                    + 'true' if self.is_enable_reduce else 'false'),
+                   '-Dhunor.enableRules={0}'.format(
+                       'true' if self.is_enable_reduce else 'false'),
+                   '-Dhunor.enableNewMutations={0}'.format(
+                       'true' if self.is_enable_new_mutations else 'false'),
                    self._includes(class_file))
 
         class_name = class_file.split('.')[0].replace(os.sep, '.')
