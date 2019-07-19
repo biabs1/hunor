@@ -13,8 +13,8 @@ VERSION = '0.3.0'
 class HunorPlugin:
 
     def __init__(self, options):
-        self.project_dir = options.project_dir
-        self.mutants_dir = options.mutants_dir
+        self.project_dir = options.source
+        self.mutants_dir = options.mutants
         self.is_enable_reduce = options.is_enable_reduce
         self.is_enable_new_mutations = options.is_enable_new_mutations
 
