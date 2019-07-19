@@ -3,16 +3,23 @@ import re
 import json
 
 
-def get_class_files(path, package='', ext='.class'):
+def get_java_files(path):
+    return get_files(path, ext='.java')
+
+
+def get_class_files(path):
+    return get_files(path, ext='.class')
+
+
+def get_files(path, root='', ext=None):
     files = []
 
     for node in os.listdir(path):
         node_path = os.path.join(path, node)
         if os.path.isdir(node_path):
-            files += get_class_files(node_path, os.path.join(package, node),
-                                     ext)
-        elif os.path.splitext(node_path)[1] == ext:
-            files.append(os.path.join(package, node))
+            files += get_files(node_path, os.path.join(root, node), ext)
+        elif ext is None or os.path.splitext(node_path)[1] == ext:
+            files.append(os.path.join(root, node))
 
     return files
 
@@ -56,5 +63,6 @@ def set_equal(a, b):
 
 
 def sort_files(files):
-    return sorted(files, key=lambda x: (int(0 if re.sub(r'[^0-9]+', '', x) == ''
-                                            else re.sub(r'[^0-9]+', '', x)), x))
+    return sorted(files, key=lambda x: (
+        int(0 if re.sub(r'[^0-9]+', '', x) == ''
+            else re.sub(r'[^0-9]+', '', x)), x))

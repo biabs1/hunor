@@ -38,10 +38,9 @@ class JUnit:
 
         coverage_source_dirs = self.source_dir
 
-        if os.path.exists(
-                os.path.join(mutant_classpath,
-                             self.sut_class.replace('.', os.sep) + '.java')):
-                coverage_source_dirs = mutant_classpath
+        if os.path.exists(os.path.join(mutant_classpath,
+                          self.sut_class.replace('.', os.sep) + '.java')):
+            coverage_source_dirs = mutant_classpath
 
         command = [
             self.jdk.java,
@@ -160,7 +159,6 @@ class JUnit:
             output_dir, 'coverage-report',
             self.sut_class.replace('.', os.sep) + '.html')
 
-        total = 0
         tests = set()
 
         if os.path.exists(report_html_path):
@@ -171,7 +169,6 @@ class JUnit:
                     td_count = tr.find_all('td', class_='callpoints-count')
                     if td_line and td_count:
                         if mutation_line == int(td_line[0].string):
-                            total = len(tr.find_all('li'))
                             for li in tr.find_all('li'):
                                 method_name = _extract_li_id(li.string)
                                 if method_name is not None:
@@ -206,7 +203,7 @@ def _extract_results(output):
 def _extract_test_id(output):
     tests_fail = set()
     for test in re.findall(r'\.test[0-9]+\([A-Za-z0-9_]+\.java:[0-9]+\)', output):
-        i = re.findall('\d+', test)
+        i = re.findall(r'\d+', test)
         file = re.findall(r'\(.+?(?=\.)', test)[0][1:]
         test_case = re.findall(r'\..+?(?=\()', test)[0][1:]
 

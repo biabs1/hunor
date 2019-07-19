@@ -4,7 +4,8 @@ from unittest.mock import MagicMock
 import os
 import subprocess
 
-from hunor.tools.java import JDK, Java, TIMEOUT as JAVA_TIMEOUT
+from hunor.tools.java import JDK, TIMEOUT as JAVA_TIMEOUT
+from hunor.tools.java_factory import Java
 
 
 class TestJDK(TestCase):

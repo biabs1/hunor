@@ -1,4 +1,3 @@
-import re
 import os
 
 from hunor.utils import list_equal

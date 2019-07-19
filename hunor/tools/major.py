@@ -83,6 +83,6 @@ class Major:
 
         self._exec(parameters, cwd=source_dir)
 
-    def generate(self, classes_dir, source_dir, java_file, count=0):
+    def generate(self, classes_dir, source_dir, java_file):
         self._exec_major(java_file, source_dir, classes_dir)
         return []

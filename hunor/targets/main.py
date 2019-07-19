@@ -7,7 +7,7 @@ import javalang.tree as tree
 from javalang.tree import Node
 from javalang.parser import JavaSyntaxError
 
-from hunor.utils import get_class_files
+from hunor.utils import get_java_files
 
 
 PROJECT_DIR = os.path.join('../../example/relational/src/main/java')
@@ -32,7 +32,7 @@ ALLOWED_PARAM_TYPES = [
 
 def main():
     source_dir = PROJECT_DIR
-    files = get_class_files(source_dir, ext='.java')
+    files = get_java_files(source_dir)
     targets = []
 
     for file in files:
@@ -312,7 +312,7 @@ def _ast(node):
                         'name': str(c),
                         'attrs': _get_attrs(c),
                         'children': _ast(c)
-                })
+                    })
     return d
 
 

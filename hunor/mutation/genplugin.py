@@ -8,7 +8,7 @@ from hunor.mutation.generate import _persist_targets
 from hunor.mutation.generate import _save_state
 from hunor.mutation.generate import _create_mutants_dir
 from hunor.utils import sort_files
-from hunor.utils import get_class_files
+from hunor.utils import get_java_files
 from hunor.main import Hunor
 
 from hunor.tools.hunor_plugin import HunorPlugin
@@ -24,7 +24,7 @@ def main():
     targets = state[0]
     analysed_files = state[1]
 
-    files = get_class_files(options.java_src, ext='.java')
+    files = get_java_files(options.java_src)
 
     for i, file in enumerate(sort_files(files)):
         print('PROCESSING {0} {1}/{2}'.format(file, i + 1, len(files)))

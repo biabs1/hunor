@@ -44,7 +44,7 @@ class HunorPlugin:
     def subsuming(self, class_name, count=0):
         maven = MavenFactory.get_instance()
         maven.exec(self.project_dir, TIMEOUT, self._plugin_ref('subsuming'),
-                   '-Dhunor.output={0}'.format(os.path.abspath(self.mutants_dir)),
+                   '-Dhunor.output={0}'.format(self._dest_dir()),
                    '-Dhunor.skipTests=true')
 
         return self.read_targets_json(class_name, count)
@@ -93,7 +93,7 @@ class HunorPlugin:
                         'prefix_operator': mutant['prefixExpOperator'],
                         'mutants': []
                     }
-            )
+                )
             count += 1
         return targets
 
@@ -102,4 +102,7 @@ class HunorPlugin:
         if os.path.exists(result_dir):
             shutil.rmtree(result_dir)
 
-
+    def _dest_dir(self):
+        if self.is_enable_reduce:
+            return os.path.abspath(self.mutants_dir + '_reduced')
+        return os.path.abspath(self.mutants_dir)

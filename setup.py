@@ -45,7 +45,8 @@ setup(
         'console_scripts': [
             'hunor=hunor.main:main',
             'hunor-gen=hunor.mutation.generate:main',
-            'hunor-pgen=hunor.mutation.genplugin:main'
+            'hunor-pgen=hunor.mutation.genplugin:main',
+            'hunor-eval=hunor.mutation.evaluation:main'
         ]
     },
     classifiers=[

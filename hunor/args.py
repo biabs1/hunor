@@ -73,7 +73,7 @@ class Options:
                 'suites_evosuite': self.suites_evosuite,
                 'suites_randoop': self.suites_randoop,
                 'is_minimal_testsuite_disabled':
-                    self.is_minimal_testsuite_disabled,
+                self.is_minimal_testsuite_disabled,
                 'is_enable_reduce': self.is_enable_reduce,
                 'is_enable_new_mutations': self.is_enable_new_mutations
         }, indent=2)

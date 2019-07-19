@@ -4,7 +4,7 @@ import json
 import random
 
 from hunor.utils import generate_classpath
-from hunor.utils import get_class_files
+from hunor.utils import get_java_files
 
 
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -68,8 +68,7 @@ class Randoop:
         classpath = generate_classpath([self.classpath, self.tests_src, JUNIT,
                                         HAMCREST])
 
-        for java_test_file in sorted(get_class_files(
-                self.tests_src, ext='.java')):
+        for java_test_file in sorted(get_java_files(self.tests_src)):
             self.jdk.run_javac(os.path.join(self.tests_src, java_test_file),
                                5 * 60, self.tests_src, '-classpath', classpath,
                                '-d', self.tests_classes)

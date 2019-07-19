@@ -3,7 +3,6 @@ import re
 import subprocess
 import shutil
 import json
-import copy
 
 from hunor.mutation.mutant import Mutant
 from hunor.utils import generate_classpath
