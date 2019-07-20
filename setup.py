@@ -35,7 +35,8 @@ setup(
         'beautifulsoup4==4.6.0',
         'graphviz==0.8.3',
         'javalang==0.11.0',
-        'peewee==3.7.1'
+        'peewee==3.7.1',
+        'coloredlogs==10.0'
     ],
     test_suite='nose.collector',
     tests_require=test_requires,

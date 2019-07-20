@@ -97,12 +97,12 @@ class JUnit:
         classpath = generate_classpath([
             JMOCKIT, JUNIT, HAMCREST, EVOSUITE_RUNTIME,
             suite_classes_dir,
-            mutant.dir,
+            mutant.path,
             self.classpath
         ])
 
         return self._exec(suite_dir, sut_class, test_class, classpath,
-                          mutant.dir, timeout)
+                          mutant.path, timeout)
 
     def _exec(self, suite_dir, sut_class, test_class, classpath,
               cov_src_dirs='.', timeout=TIMEOUT):

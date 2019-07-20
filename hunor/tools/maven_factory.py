@@ -96,7 +96,6 @@ class Maven:
 
     @staticmethod
     def extract_results(output):
-        logger.debug(output)
         output = re.findall('Compiling [0-9]* source files? to .*\n', output)
         if output:
             output = output[0].replace('\n', '').split()

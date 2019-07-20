@@ -1,6 +1,7 @@
 import os
 import copy
 import logging
+from coloredlogs import ColoredFormatter
 
 from collections import namedtuple
 
@@ -34,11 +35,12 @@ SimpleMutant = namedtuple('SimpleMutant', [
 
 
 def configure_logger():
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    style = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    formatter = logging.Formatter(style)
+    colored = ColoredFormatter(style)
     ch = logging.StreamHandler()
     fh = logging.FileHandler(os.path.join('hunor-evaluation.log'))
-    ch.setFormatter(formatter)
+    ch.setFormatter(colored)
     fh.setFormatter(formatter)
     logger.addHandler(ch)
     logger.addHandler(fh)
@@ -74,21 +76,21 @@ def main():
     files = get_java_files(options.java_src)
 
     for i, file in enumerate(sort_files(files)):
-        print('EVALUATING {0} {1}/{2}'.format(file, i + 1, len(files)))
+        logger.info('EVALUATING {0} {1}/{2}'.format(file, i + 1, len(files)))
         if file not in analysed_files['files']:
             t = tool.generate(file, len(targets))
             t_r = tool_reduced.generate(file, len(targets))
 
-            print('\ttargets found: {0}, in reduced: {1}'
-                  .format(len(t), len(t_r)))
+            logger.info('\ttargets found: {0}, in reduced: {1}'
+                        .format(len(t), len(t_r)))
             targets += t
             for target in t_r:
-                log = '| RUNNING FOR: {0} |'
+                log = '| RUNNING FOR: {0} |'.format(target['directory'])
                 mutants_dir = os.path.join(options.mutants + '_reduced',
                                            target['directory'])
-                print('-' * (len(log) + len(target['directory'])))
-                print(log.format(target['directory']))
-                print('-' * (len(log) + len(target['directory'])))
+                logger.info('-' * len(log))
+                logger.info(log)
+                logger.info('-' * len(log))
 
                 mutation_tool = MuJava(mutants_dir)
                 mutants = mutation_tool.read_log()
@@ -104,21 +106,15 @@ def main():
                         sut_class=target['class'],
                         params=['-Dsearch_budget=60']
                     )
-                    simple_mutant = SimpleMutant(mutant.id,
-                                                 mutant.operator,
-                                                 mutant.line_number,
-                                                 mutant.method,
-                                                 mutant.transformation,
-                                                 mutant.path)
 
-                    suite = evosuite.generate_differential(simple_mutant.dir)
+                    suite = evosuite.generate_differential(mutant.path)
 
                     logger.debug('Test suite created to %s mutation with'
                                  ' %i assertions.', mutant.mutation,
                                  suite.tests_with_assertion)
 
                     r = junit.exec_suite_with_mutant(suite, target['class'],
-                                                     simple_mutant)
+                                                     mutant)
                     if not JUnit.check_pass(r):
                         count_assertions += suite.tests_with_assertion
                         suites.append(suite)
@@ -127,8 +123,98 @@ def main():
                                     'EvosuiteR fail. :(', mutant.mutation)
 
                 # TODO execute junit agains all mutants of full set.
+                result = True
 
-            _save_state(options, state, t_r, file)
+                logger.debug('Testing all %i suites in original program',
+                             len(suites))
+                for suite in suites:
+                    result = (result and JUnit.check_pass(
+                        junit.exec_suite(suite, target['class']))
+                              and suite.tests_with_assertion > 0)
+
+                if result:
+                    logger.debug('All tests created and not failing in '
+                                 'original program.')
+                else:
+                    logger.warning('Any suite is empty or failing in original'
+                                   ' program.')
+
+                mutants_full_dir = os.path.join(options.mutants,
+                                                target['directory'])
+
+                all_mutants = MuJava(mutants_full_dir).read_log()
+                total_mutants = len(all_mutants)
+
+                if (result and mutants
+                        and len(suites) == len(mutants)):
+
+                    killed_mutants = []
+                    not_killed_mutants = []
+
+                    for mutant in all_mutants:
+                        mutant = all_mutants[mutant]
+                        result = junit.exec_suites_with_mutant(suites,
+                                                               target['class'],
+                                                               mutant)
+                        if not JUnit.check_pass(result):
+                            logger.debug('Mutation %s (%s) was killed by %i tests.',
+                                         mutant.mutation, mutant.id,
+                                         result.fail_tests)
+                            killed_mutants.append(mutant.mutation)
+                        else:
+                            logger.debug('Mutation %s (%s) was not killed.',
+                                         mutant.mutation, mutant.id)
+                            not_killed_mutants.append(mutant.mutation)
+
+                    percent = (len(killed_mutants) / total_mutants) * 100
+                    logger.info('%i mutants of %i were killed by tests. (%.2f)',
+                                len(killed_mutants), total_mutants, percent),
+
+                    headers = ['target', 'operator', 'mutants_in_minimal',
+                               'test_suites', 'assertions', 'mutants',
+                               'killed_mutants', '%', 'differential_success',
+                               'minimal', 'survive', 'killed', 'class', 'method',
+                               'line', 'column', 'statement', 'operator']
+                    write_to_csv(headers, [
+                        str(target['id']), target['target_repr'], str(len(mutants)),
+                        str(len(suites)), str(count_assertions),
+                        str(total_mutants), str(len(killed_mutants)), str(percent),
+                        str(len(suites) == len(mutants)),
+                        ','.join(mutants),
+                        ','.join(not_killed_mutants),
+                        ','.join(killed_mutants), target['class'],
+                        target['method'], str(target['line']),
+                        str(target['column']), target['statement'],
+                        target['operator']], output_dir=options.mutants)
+
+                if mutants and len(suites) < len(mutants):
+                    headers = ['id', 'class', 'method', 'line', 'column',
+                               'statement', 'operator']
+                    write_to_csv(headers, [str(target['id']), target['class'],
+                                           target['method'], str(target['line']),
+                                           str(target['column']),
+                                           target['statement'],
+                                           target['operator']],
+                                 output_dir=options.mutants,
+                                 filename='not_tested.csv')
+
+                _save_state(options, state, t_r, file)
+
+
+def write_to_csv(headers, result, output_dir='.', filename='evaluation.csv',
+                 exclude_if_exists=False):
+    file = os.path.join(output_dir, filename)
+
+    if exclude_if_exists:
+        if os.path.exists(file):
+            os.remove(file)
+
+    if not os.path.exists(file):
+        with open(file, 'w') as f:
+            f.write(';'.join(headers) + '\n')
+
+    with open(file, 'a') as f:
+        f.write(';'.join(result) + '\n')
 
 
 if __name__ == '__main__':
