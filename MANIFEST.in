@@ -8,6 +8,7 @@ include hunor/tools/bin/junit-4.12.jar
 include hunor/tools/bin/mujava.jar
 include hunor/tools/bin/openjava.jar
 include hunor/tools/bin/randoop-all-4.0.3.jar
+include hunor/tools/bin/soot-3.3.0-jar-with-dependencies.jar
 
 include hunor/tools/bin/major
 include hunor/tools/bin/major/bin/ant
