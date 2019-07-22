@@ -46,6 +46,10 @@ class Java:
     def tools(self):
         return os.path.join(self.java_home, 'lib', 'tools.jar')
 
+    @property
+    def rt(self):
+        return os.path.join(self.java_home, 'jre', 'lib', 'rt.jar')
+
     def _version_java(self):
         return self.run('-version')
 

@@ -24,6 +24,12 @@ def get_files(path, root='', ext=None):
     return files
 
 
+def class_to_dir(class_file, only_package=False):
+    if only_package:
+        return os.sep.join(class_file.split('.')[0:-1])
+    return class_file.replace('.', os.sep)
+
+
 def generate_classpath(paths):
     return os.pathsep.join(paths)
 

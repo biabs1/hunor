@@ -13,8 +13,9 @@ SAFIRA = os.sep.join([PATH, 'safira.jar'])
 MUJAVA = os.path.join(PATH, 'mujava.jar')
 COMMONSIO = os.path.join(PATH, 'commons-io-2.4.jar')
 OPENJAVA = os.path.join(PATH, 'openjava.jar')
+SOOT = os.path.join(PATH, 'soot-3.3.0-jar-with-dependencies.jar')
 
 
 __all__ = ['JUNIT', 'HAMCREST', 'EVOSUITE', 'EVOSUITE_RUNTIME',
            'JMOCKIT', 'RANDOOP', 'SAFIRA', 'MUJAVA', 'COMMONSIO',
-           'OPENJAVA']
+           'OPENJAVA', 'SOOT']
