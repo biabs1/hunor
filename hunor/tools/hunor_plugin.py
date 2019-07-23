@@ -7,7 +7,7 @@ from hunor.utils import read_json
 TIMEOUT = 5 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 
 
 class HunorPlugin:
@@ -35,7 +35,7 @@ class HunorPlugin:
                        'true' if self.is_enable_reduce else 'false'),
                    '-Dhunor.enableNewMutations={0}'.format(
                        'true' if self.is_enable_new_mutations else 'false'),
-                   self._includes(class_file))
+                   '-X', self._includes(class_file))
 
         class_name = class_file.split('.')[0].replace(os.sep, '.')
 
@@ -45,7 +45,7 @@ class HunorPlugin:
         maven = MavenFactory.get_instance()
         maven.exec(self.project_dir, TIMEOUT, self._plugin_ref('subsuming'),
                    '-Dhunor.output={0}'.format(self._dest_dir()),
-                   '-Dhunor.skipTests=true')
+                   '-Dhunor.skipTests=true', '-X')
 
         return self.read_targets_json(class_name, count)
 
