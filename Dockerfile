@@ -1,7 +1,7 @@
 FROM maven:3.6.1-jdk-8
 
 ENV PYTHONUNBUFFERED 1
-ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.1
+ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.2
 
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y python3 python3-pip graphviz
