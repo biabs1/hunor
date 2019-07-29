@@ -176,16 +176,16 @@ def main():
                                     'Mutation %s (%s) was killed by %i tests.',
                                     mutant.mutation, mutant.id,
                                     result.fail_tests)
-                                killed_mutants.add(mutant.mutation)
+                                killed_mutants.add(mutant)
                             else:
                                 logger.debug(
                                     'Mutation %s (%s) was not killed.',
                                     mutant.mutation, mutant.id)
 
                                 if tce.run(mutant):
-                                    equivalent_mutants.add(mutant.mutation)
+                                    equivalent_mutants.add(mutant)
                                     logger.debug('\tBut it is equivalent.')
-                                not_killed_mutants.add(mutant.mutation)
+                                not_killed_mutants.add(mutant)
 
                         not_equivalent_mutants = (total_mutants
                                                   - len(equivalent_mutants))
@@ -231,10 +231,11 @@ def main():
                             str(percent),
                             str(len(suites) == len(mutants)),
                             ','.join([mutants[m].mutation for m in mutants]),
-                            ','.join(not_killed_mutants.difference(
-                                equivalent_mutants)),
-                            ','.join(killed_mutants),
-                            ','.join(equivalent_mutants),
+                            ','.join([m.mutation for m in
+                                      not_killed_mutants.difference(
+                                          equivalent_mutants)]),
+                            ','.join([m.mutation for m in killed_mutants]),
+                            ','.join([m.mutation for m in equivalent_mutants]),
                             target['class'],
                             target['method'],
                             str(target['line']),
