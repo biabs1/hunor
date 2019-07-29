@@ -78,7 +78,7 @@ def main():
 
     for i, file in enumerate(sort_files(files)):
         logger.info('EVALUATING {0} {1}/{2}'.format(file, i + 1, len(files)))
-        if file not in analysed_files['files']:
+        if file not in analysed_files['files'] and include(project_dir, file):
             t = tool.generate(file, len(targets))
             t_r = tool_reduced.generate(file, len(targets))
 
@@ -87,8 +87,13 @@ def main():
             targets += t
             count = 1
             for target in t_r:
-                log = '| RUNNING FOR: {0} {1}/{2} |'.format(
-                    target['directory'], count, len(t_r))
+                if not include(project_dir, file, target):
+                    logger.info("skipping target {0}.".format(target['oid']))
+                    continue
+
+                log = '| RUNNING FOR: {0} {1}/{2} {3} (#{4})|'.format(
+                    target['directory'], count, len(t_r),
+                    target['target_repr'], target['oid'])
                 count += 1
                 mutants_dir = os.path.join(options.mutants + '_reduced',
                                            target['directory'])
@@ -256,6 +261,27 @@ def main():
                                      filename='not_tested.csv')
 
                 _save_state(options, state, t_r, file)
+
+
+def include(project_dir, file, target=None):
+    try:
+        includes = config(os.path.abspath(
+            os.path.join(project_dir, 'includes.json')))
+
+        if len(includes.keys()) == 0:
+            return True
+
+        if file in includes:
+            if target is None:
+                return True
+            elif includes[file] is None:
+                return True
+            elif target['oid'] in includes[file]:
+                return True
+
+        return False
+    except IOError:
+        return True
 
 
 def write_to_csv(headers, result, output_dir='.', filename='evaluation.csv',

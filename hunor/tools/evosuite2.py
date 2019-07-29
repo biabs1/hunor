@@ -108,8 +108,12 @@ class Evosuite(SuiteGenerator):
     def _get_tests_with_assertion(output_bin):
         if not output_bin:
             return 0
-        output = output_bin.decode('unicode_escape')
-        return Evosuite._extract_differential_output(output)
+
+        try:
+            output = output_bin.decode('unicode_escape')
+            return Evosuite._extract_differential_output(output)
+        except UnicodeDecodeError:
+            return 0
 
     @staticmethod
     def _extract_differential_output(output):
