@@ -153,14 +153,14 @@ def main():
                                                     target['directory'])
 
                     all_mutants = MuJava(mutants_full_dir).read_log()
-                    equivalent_mutants = []
+                    equivalent_mutants = set()
                     total_mutants = len(all_mutants)
 
                     if (result and mutants
                             and len(suites) == len(mutants)):
 
-                        killed_mutants = []
-                        not_killed_mutants = []
+                        killed_mutants = set()
+                        not_killed_mutants = set()
 
                         for mutant in all_mutants:
                             mutant = all_mutants[mutant]
@@ -176,30 +176,29 @@ def main():
                                     'Mutation %s (%s) was killed by %i tests.',
                                     mutant.mutation, mutant.id,
                                     result.fail_tests)
-                                killed_mutants.append(mutant.mutation)
+                                killed_mutants.add(mutant.mutation)
                             else:
                                 logger.debug(
                                     'Mutation %s (%s) was not killed.',
                                     mutant.mutation, mutant.id)
 
                                 if tce.run(mutant):
-                                    equivalent_mutants.append(mutant.mutation)
+                                    equivalent_mutants.add(mutant.mutation)
                                     logger.debug('\tBut it is equivalent.')
-                                not_killed_mutants.append(mutant.mutation)
+                                not_killed_mutants.add(mutant.mutation)
 
                         not_equivalent_mutants = (total_mutants
                                                   - len(equivalent_mutants))
 
-                        percent = ((len(killed_mutants)
-                                    / not_equivalent_mutants) * 100)
+                        percent = (len(killed_mutants) / not_equivalent_mutants)
                         logger.info(
                             '%i mutants of %i were killed by tests. (%.2f)',
                             len(killed_mutants), not_equivalent_mutants,
                             percent),
 
                         headers = [
+                            'id',
                             'target',
-                            'operator',
                             'mutants_in_minimal',
                             'test_suites',
                             'assertions',
@@ -231,8 +230,9 @@ def main():
                             str(not_equivalent_mutants),
                             str(percent),
                             str(len(suites) == len(mutants)),
-                            ','.join(mutants),
-                            ','.join(not_killed_mutants),
+                            ','.join([mutants[m].mutation for m in mutants]),
+                            ','.join(not_killed_mutants.difference(
+                                equivalent_mutants)),
                             ','.join(killed_mutants),
                             ','.join(equivalent_mutants),
                             target['class'],

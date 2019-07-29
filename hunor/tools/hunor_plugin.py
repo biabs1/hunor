@@ -7,7 +7,7 @@ from hunor.utils import read_json
 TIMEOUT = 5 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.3.2'
+VERSION = '0.3.3'
 
 
 class HunorPlugin:
@@ -73,7 +73,7 @@ class HunorPlugin:
                         'line': mutant['lineNumber'],
                         'column': 0,
                         'statement':
-                            ''.join(mutant['transformation'].split('=>')[1])
+                            ''.join(mutant['transformation'].split('=>')[0])
                             .strip(),
                         'statement_nodes': '',
                         'context': [],
