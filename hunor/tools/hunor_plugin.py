@@ -1,10 +1,11 @@
 import os
 import shutil
+import subprocess
 
 from hunor.tools.maven_factory import MavenFactory
 from hunor.utils import read_json
 
-TIMEOUT = 5 * 60
+TIMEOUT = 10 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
 VERSION = '0.3.3'
@@ -27,25 +28,31 @@ class HunorPlugin:
         return '-Dhunor.includes=**{0}{1}'.format(os.sep, file)
 
     def generate(self, class_file, count=0):
-        self._clean_result_dir()
-        maven = MavenFactory.get_instance()
-        maven.exec(self.project_dir, TIMEOUT,
-                   self._plugin_ref('mujava-generate'),
-                   '-Dhunor.enableRules={0}'.format(
-                       'true' if self.is_enable_reduce else 'false'),
-                   '-Dhunor.enableNewMutations={0}'.format(
-                       'true' if self.is_enable_new_mutations else 'false'),
-                   '-X', self._includes(class_file))
+        try:
+            self._clean_result_dir()
+            maven = MavenFactory.get_instance()
+            maven.exec(self.project_dir, TIMEOUT,
+                       self._plugin_ref('mujava-generate'),
+                       '-Dhunor.enableRules={0}'.format(
+                           'true' if self.is_enable_reduce else 'false'),
+                       '-Dhunor.enableNewMutations={0}'.format(
+                           'true' if self.is_enable_new_mutations else 'false'),
+                       '-X', self._includes(class_file))
+        except subprocess.TimeoutExpired:
+            pass
 
         class_name = class_file.split('.')[0].replace(os.sep, '.')
 
         return self.subsuming(class_name, count)
 
     def subsuming(self, class_name, count=0):
-        maven = MavenFactory.get_instance()
-        maven.exec(self.project_dir, TIMEOUT, self._plugin_ref('subsuming'),
-                   '-Dhunor.output={0}'.format(self._dest_dir()),
-                   '-Dhunor.skipTests=true', '-X')
+        try:
+            maven = MavenFactory.get_instance()
+            maven.exec(self.project_dir, TIMEOUT, self._plugin_ref('subsuming'),
+                       '-Dhunor.output={0}'.format(self._dest_dir()),
+                       '-Dhunor.skipTests=true', '-X')
+        except subprocess.TimeoutExpired:
+            pass
 
         return self.read_targets_json(class_name, count)
 
