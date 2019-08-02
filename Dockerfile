@@ -1,10 +1,13 @@
 FROM maven:3.6.1-jdk-8
 
 ENV PYTHONUNBUFFERED 1
-ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.6
 
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y python3 python3-pip graphviz
+
+
+ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.6
+
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:get \
     -Dartifact=br.ufal.ic.easy.hunor.plugin:hunor-maven-plugin:$HUNOR_MAVEN_PLUGIN_VERSION \
     -DremoteRepositories=marcioaug::::https://raw.githubusercontent.com/marcioaug/mvn/repo
