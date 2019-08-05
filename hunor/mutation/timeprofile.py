@@ -1,4 +1,5 @@
 import os
+import csv
 import copy
 import logging
 import subprocess
@@ -51,6 +52,11 @@ def main():
 
     logger.debug(project_dir)
 
+    maven = MavenFactory.get_instance()
+
+    maven.compile(project_dir, clean=True)
+    maven.test(project_dir)
+
     _create_mutants_dir(options)
 
     options.is_enable_reduce = False
@@ -66,20 +72,66 @@ def main():
     if 'include' in conf:
         include = conf['include']
 
+    with open('time_result.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=';')
+        writer.writerow(['file',
+                         'full_set_time',
+                         'full_set_mutants',
+                         'full_set_killed',
+                         'full_set_survived',
+                         'full_set_stillborn',
+                         'full_set_valid',
+                         'full_set_score',
+                         'reduced_set_time',
+                         'reduced_set_mutants',
+                         'reduced_set_killed',
+                         'reduced_set_survived',
+                         'reduced_set_stillborn',
+                         'reduced_set_valid',
+                         'reduced_set_score'
+                         ])
+
     for i, file in enumerate(sort_files(files)):
         if file in include:
+            full_set_result = None
+            redu_set_result = None
+
             try:
-                tool.gen(file, analyze=True)
+                full_set_result = tool.gen(file, analyze=True)
             except subprocess.TimeoutExpired:
                 logger.error("Timeout expired while process file {0} to "
                              "generate full set of mutants.".format(file))
+            except Exception as e:
+                logger.error("Don't stop me now!", e)
 
             try:
-                tool_reduced.gen(file, analyze=True)
+                redu_set_result = tool_reduced.gen(file, analyze=True)
             except subprocess.TimeoutExpired:
                 logger.error("Timeout expired while process file {0} to "
                              "generate reduced set of mutants.".format(file))
+            except Exception as e:
+                logger.error("Don't stop me now!", e)
 
+            if full_set_result and redu_set_result:
+                print(full_set_result, redu_set_result)
+                with open('time_result.csv', 'a') as csvfile:
+                    writer = csv.writer(csvfile, delimiter=';')
+                    writer.writerow([file,
+                                     full_set_result[0],
+                                     full_set_result[1][0],
+                                     full_set_result[1][1],
+                                     full_set_result[1][2],
+                                     full_set_result[1][3],
+                                     full_set_result[1][4],
+                                     full_set_result[1][5],
+                                     redu_set_result[0],
+                                     redu_set_result[1][0],
+                                     redu_set_result[1][1],
+                                     redu_set_result[1][2],
+                                     redu_set_result[1][3],
+                                     redu_set_result[1][4],
+                                     redu_set_result[1][5],
+                                     ])
 
 
 if __name__ == '__main__':

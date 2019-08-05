@@ -44,12 +44,10 @@ class HunorPlugin:
 
         output = maven.exec(*params)
 
-        print(output.decode('unicode_escape'))
-
         if analyze:
-            output = self._analyse(debug=debug)
+            return self._extract_time(output), self._analyse(debug=debug)
 
-        return output
+        return self._extract_time(output),
 
     def _analyse(self, skip_tests=False, debug=False, split_reduced_dir=False):
         maven = MavenFactory.get_instance()
@@ -67,10 +65,7 @@ class HunorPlugin:
 
         output = maven.exec(*params)
 
-        print(output.decode('unicode_escape'))
-
-        return output
-
+        return self._extract_result(output)
 
     def generate(self, class_file, count=0):
         try:
@@ -147,3 +142,21 @@ class HunorPlugin:
         if self.is_enable_reduce:
             return os.path.abspath(self.mutants_dir + '_reduced')
         return os.path.abspath(self.mutants_dir)
+
+    @staticmethod
+    def _extract_time(output):
+        output = output.decode('unicode_escape')
+        for line in output.split('\n'):
+            if line.startswith('[INFO] Total time:'):
+                return str(line).replace('[INFO] Total time:', '').strip()
+
+    @staticmethod
+    def _extract_result(output):
+        output = output.decode('unicode_escape')
+        for line in output.split('\n'):
+            if line.startswith('[INFO] total:') and 'score:' in line:
+                print(line)
+                result = tuple()
+                for data in line.split(','):
+                    result += float(str(data.split(':')[1]).strip()),
+                return result
