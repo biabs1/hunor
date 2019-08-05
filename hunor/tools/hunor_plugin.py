@@ -27,17 +27,54 @@ class HunorPlugin:
     def _includes(file):
         return '-Dhunor.includes=**{0}{1}'.format(os.sep, file)
 
+    def gen(self, class_file, analyze=False, debug=False):
+        self._clean_result_dir()
+        maven = MavenFactory.get_instance()
+
+        params = (self.project_dir, TIMEOUT,
+                  self._plugin_ref('mujava-generate'),
+                  '-Dhunor.enableRules={0}'.format(
+                      'true' if self.is_enable_reduce else 'false'),
+                  '-Dhunor.enableNewMutations={0}'.format(
+                       'true' if self.is_enable_new_mutations else 'false'),
+                  self._includes(class_file))
+
+        if debug:
+            params += '-X',
+
+        output = maven.exec(*params)
+
+        print(output.decode('unicode_escape'))
+
+        if analyze:
+            output = self._analyse(debug=debug)
+
+        return output
+
+    def _analyse(self, skip_tests=False, debug=False, split_reduced_dir=False):
+        maven = MavenFactory.get_instance()
+
+        params = (self.project_dir, TIMEOUT,
+                  self._plugin_ref('subsuming'),
+                  '-Dhunor.skipTests={0}'.format(
+                      'true' if skip_tests else 'false'))
+
+        if split_reduced_dir:
+            params += '-Dhunor.output={0}'.format(self._dest_dir()),
+
+        if debug:
+            params += '-X',
+
+        output = maven.exec(*params)
+
+        print(output.decode('unicode_escape'))
+
+        return output
+
+
     def generate(self, class_file, count=0):
         try:
-            self._clean_result_dir()
-            maven = MavenFactory.get_instance()
-            maven.exec(self.project_dir, TIMEOUT,
-                       self._plugin_ref('mujava-generate'),
-                       '-Dhunor.enableRules={0}'.format(
-                           'true' if self.is_enable_reduce else 'false'),
-                       '-Dhunor.enableNewMutations={0}'.format(
-                           'true' if self.is_enable_new_mutations else 'false'),
-                       '-X', self._includes(class_file))
+            self.gen(class_file)
         except subprocess.TimeoutExpired:
             pass
 
@@ -47,10 +84,7 @@ class HunorPlugin:
 
     def subsuming(self, class_name, count=0):
         try:
-            maven = MavenFactory.get_instance()
-            maven.exec(self.project_dir, TIMEOUT, self._plugin_ref('subsuming'),
-                       '-Dhunor.output={0}'.format(self._dest_dir()),
-                       '-Dhunor.skipTests=true', '-X')
+            self._analyse(skip_tests=True, split_reduced_dir=True)
         except subprocess.TimeoutExpired:
             pass
 
