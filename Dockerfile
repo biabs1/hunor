@@ -6,7 +6,7 @@ RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y python3 python3-pip graphviz
 
 
-ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.6
+ENV HUNOR_MAVEN_PLUGIN_VERSION 0.3.7
 
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:get \
     -Dartifact=br.ufal.ic.easy.hunor.plugin:hunor-maven-plugin:$HUNOR_MAVEN_PLUGIN_VERSION \

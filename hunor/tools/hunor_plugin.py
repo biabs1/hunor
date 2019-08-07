@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 import subprocess
 
 from hunor.tools.maven_factory import MavenFactory
@@ -8,7 +9,10 @@ from hunor.utils import read_json
 TIMEOUT = 10 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.3.6'
+VERSION = '0.3.7'
+
+
+logger = logging.getLogger()
 
 
 class HunorPlugin:
@@ -42,6 +46,8 @@ class HunorPlugin:
         if debug:
             params += '-X',
 
+        logger.info("Generating mutants with {0}:{1}".format(ARTIFACT_ID,
+                                                             VERSION))
         output = maven.exec(*params)
 
         if analyze:
@@ -52,7 +58,12 @@ class HunorPlugin:
     def _analyse(self, skip_tests=False, debug=False, split_reduced_dir=False):
         maven = MavenFactory.get_instance()
 
-        params = (self.project_dir, TIMEOUT,
+        timeout = TIMEOUT
+
+        if not skip_tests:
+            timeout = 24 * 60 * 60
+
+        params = (self.project_dir, timeout,
                   self._plugin_ref('subsuming'),
                   '-Dhunor.skipTests={0}'.format(
                       'true' if skip_tests else 'false'))
@@ -63,6 +74,7 @@ class HunorPlugin:
         if debug:
             params += '-X',
 
+        logger.info("Starting mutation testing...")
         output = maven.exec(*params)
 
         return self._extract_result(output)
@@ -152,11 +164,11 @@ class HunorPlugin:
 
     @staticmethod
     def _extract_result(output):
+        time = HunorPlugin._extract_time(output)
         output = output.decode('unicode_escape')
         for line in output.split('\n'):
             if line.startswith('[INFO] total:') and 'score:' in line:
-                print(line)
-                result = tuple()
+                result = time,
                 for data in line.split(','):
                     result += float(str(data.split(':')[1]).strip()),
                 return result
