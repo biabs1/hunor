@@ -9,7 +9,7 @@ from hunor.utils import read_json
 TIMEOUT = 10 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.3.7'
+VERSION = '0.3.8'
 
 
 logger = logging.getLogger()
@@ -17,11 +17,12 @@ logger = logging.getLogger()
 
 class HunorPlugin:
 
-    def __init__(self, options):
+    def __init__(self, options, analyze_timeout=300):
         self.project_dir = options.source
         self.mutants_dir = options.mutants
         self.is_enable_reduce = options.is_enable_reduce
         self.is_enable_new_mutations = options.is_enable_new_mutations
+        self.analyze_timeout = analyze_timeout
 
     @staticmethod
     def _plugin_ref(goal):
@@ -65,6 +66,7 @@ class HunorPlugin:
 
         params = (self.project_dir, timeout,
                   self._plugin_ref('subsuming'),
+                  '-Dhunor.timeout={0}'.format(self.analyze_timeout),
                   '-Dhunor.skipTests={0}'.format(
                       'true' if skip_tests else 'false'))
 

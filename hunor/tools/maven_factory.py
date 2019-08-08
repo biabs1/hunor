@@ -98,9 +98,8 @@ class Maven:
             self.clean(project_dir, TIMEOUT)
 
         logger.info("Testing the project with maven...")
-        return self.extract_results(
-            self._exec_mvn(project_dir, self.java.get_env(), timeout,
-                           'test').decode('unicode_escape'))
+        return self._exec_mvn(project_dir, self.java.get_env(), timeout,
+                              'test')
 
     @staticmethod
     def extract_results(output):

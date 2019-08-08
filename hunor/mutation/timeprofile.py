@@ -1,6 +1,7 @@
 import os
 import csv
 import copy
+import time
 import logging
 import subprocess
 
@@ -54,7 +55,22 @@ def main():
     maven = MavenFactory.get_instance()
 
     maven.compile(project_dir, clean=True)
+    start = time.time()
     maven.test(project_dir)
+
+    logger.info("First test execution elapsed time: {0}s".format(
+        int(time.time() - start)))
+
+    elapsed_time = 0
+
+    for i in range(5):
+        start = time.time()
+        maven.test(project_dir)
+        actual = int(time.time() - start)
+        logger.info("\t#{0}Test elapsed time: {1}s".format(i, actual))
+        elapsed_time = max(elapsed_time, actual)
+
+    logger.info("Test elapsed time: {0}s".format(elapsed_time))
 
     _create_mutants_dir(options)
 
@@ -89,8 +105,10 @@ def main():
     for i, file in enumerate(sort_files(files)):
         if file in include:
             try:
-                full_set_result = _generate_mutants(file, options, False)
-                redu_set_result = _generate_mutants(file, options, True)
+                full_set_result = _generate_mutants(file, options, False,
+                                                    elapsed_time)
+                redu_set_result = _generate_mutants(file, options, True,
+                                                    elapsed_time)
 
                 _write_to_csv(file, full_set_result, redu_set_result)
             except Exception as e:
@@ -120,7 +138,7 @@ def _write_to_csv(file, full_set_result, redu_set_result):
                          ])
 
 
-def _generate_mutants(file, options, enable_reduce=False):
+def _generate_mutants(file, options, enable_reduce=False, elapsed_time=300):
 
     logger.debug("Generating mutants to {0}. (rules enabled: {1})"
                  .format(file, enable_reduce))
@@ -128,7 +146,7 @@ def _generate_mutants(file, options, enable_reduce=False):
     options = copy.deepcopy(options)
     options.is_enable_reduce = enable_reduce
 
-    tool = HunorPlugin(options)
+    tool = HunorPlugin(options, analyze_timeout=(elapsed_time * 2))
 
     try:
         return tool.gen(file, analyze=True,
