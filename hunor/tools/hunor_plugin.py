@@ -9,7 +9,7 @@ from hunor.utils import read_json
 TIMEOUT = 10 * 60
 GROUP_ID = 'br.ufal.ic.easy.hunor.plugin'
 ARTIFACT_ID = 'hunor-maven-plugin'
-VERSION = '0.3.8'
+VERSION = '0.3.9'
 
 
 logger = logging.getLogger()

@@ -49,7 +49,8 @@ setup(
             'hunor-gen=hunor.mutation.generate:main',
             'hunor-pgen=hunor.mutation.genplugin:main',
             'hunor-eval=hunor.mutation.evaluation:main',
-            'hunor-time=hunor.mutation.timeprofile:main'
+            'hunor-time=hunor.mutation.timeprofile:main',
+            'hunor-count=hunor.mutation.genmut:main'
         ]
     },
     classifiers=[
