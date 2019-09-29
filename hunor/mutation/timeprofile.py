@@ -67,7 +67,7 @@ def main():
         start = time.time()
         maven.test(project_dir)
         actual = int(time.time() - start)
-        logger.info("\t#{0}Test elapsed time: {1}s".format(i, actual))
+        logger.info("\t#{0} Test elapsed time: {1}s".format(i, actual))
         elapsed_time = max(elapsed_time, actual)
 
     logger.info("Test elapsed time: {0}s".format(elapsed_time))
@@ -103,6 +103,7 @@ def main():
                          ])
 
     for i, file in enumerate(sort_files(files)):
+        logger.info("Checking if {0} is included. {1}/{2}".format(file, i, len(files)))
         if file in include:
             try:
                 full_set_result = _generate_mutants(file, options, False,
